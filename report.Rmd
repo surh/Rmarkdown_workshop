@@ -1,0 +1,162 @@
+---
+title: "The effect of bacteria on the *A. thaliana* Pi starvation response"
+author: "Sur Herrera Paredes"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+bibliography: references.bib
+---
+
+This document was created for the workshop **Data Management for Publishing:
+Accessibility and Reproducibility**, to be taught on April 23rd, 2022. All
+resources for the Rmarkdown session of the workshop, plus some additional
+ones, can be found in the GitHub repository
+[surh/Rmarkdown_wheelP](https://github.com/surh/Rmarkdown_wheelP).
+
+The data and code in this document reproduce some of the analysis from
+@HerreraParedes2018. The full data and code from that publication can be found
+in the GitHub repository [surh/wheelP](https://github.com/surh/wheelP).
+
+# Setup
+
+The first step is to load the packages and data that we need for analysis.
+We will use the [tidyverse](https://www.tidyverse.org/) collection of packages
+
+```{r}
+library(tidyverse)
+```
+
+Now, we read the data which is in the `data` directory of the GitHub repository
+of the workshop, and we can print the first few rows.
+```{r read data}
+Dat <- read_tsv("data/phenotypes.tsv",
+                col_types = cols(Pi_content = col_number(),
+                                 Elongation = col_number(),
+                                 Experiment = col_character(),
+                                 EndP = col_character(),
+                                 Bacteria = col_character(),
+                                 Plate = col_character()))
+Dat
+```
+
+This dataset contains `r nrow(Dat)` observations. The observations correspond to
+a subset of the observations published by @HerreraParedes2018. Specifically,
+the dataset indicates the shoot phosphate (Pi) content ($\frac{Pi\ mmol }{FW\ mg}$),
+and main root elongation (cm) measurements of *Arabidopsis thaliana* plants that
+were germinated in the absence of Pi, and then received concurrent treatments
+of one of two levels of Pi ($30 \mu M$, $100 \mu M$), and one of three bacterial
+cocktails (P1P2, I1I2, N2N3) or no bacteria (axenic).
+
+# Sanity checks
+
+```{r pheno cors}
+Dat %>%
+  ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  theme_classic()
+```
+
+```{r}
+Dat %>%
+  arrange(Elongation)
+```
+
+```{r}
+Dat <- Dat %>%
+  filter(Elongation > 2)
+```
+
+Now we have `r nrow(Dat)` observations in the dataset.
+
+```{r}
+Dat %>%
+  ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  theme_classic()
+```
+
+## What is the effect of shoot Pi content on main root elongation?
+
+```{r}
+f1 <- Elongation ~ Pi_content + Bacteria + Experiment
+m1 <- lm(f1, data = Dat %>% filter(Elongation > 2))
+summary(m1)
+```
+```{r results = "asis"}
+knitr::kable(summary(m1)$coefficients,
+             caption = paste("Coefficients of linear model (",
+                             format(f1), ").",
+                             "We observe that shoot Pi content has no significant",
+                             "effect on main root elongation."))
+```
+
+# Recreating figure 3C
+
+![Fig. 3C from @HerreraParedes2018](../figs/Fig3C.jpeg)
+
+[test single community](https://github.com/surh/wheelP/blob/master/R/test_single_community_phenotype.r)
+
+```{r, echo = FALSE}
+test_phenotype <- function(Dat, phenotype){
+  
+  f1 <- paste(phenotype, "~", "Bacteria + EndP + Experiment")
+  f1 <- as.formula(f1)
+  
+  m1 <- lm(f1, data = Dat)
+  Res <- summary(m1)$coefficients
+  
+  Res <- as.data.frame(Res)
+  Res$var <- row.names(Res)
+  row.names(Res) <- NULL
+  Res <- Res %>%
+    filter(var %in% c("BacteriaI1I2", "BacteriaN2N3", "BacteriaP1P2" )) %>%
+    mutate(phenotype = phenotype) %>%
+    rename(se = "Std. Error",
+           t.value = "t value",
+           p.value = "Pr(>|t|)")
+  
+  return(Res)
+}
+```
+
+## Bacteria effect on shoot Pi content
+
+```{r}
+pi_res <- test_phenotype(Dat, "Pi_content")
+pi_res
+```
+
+
+## Bacteria effect on main root elongation
+
+```{r}
+elongation_res <- test_phenotype(Dat, "Elongation")
+elongation_res
+```
+
+## Combine the results
+
+```{r}
+Res <- bind_rows(elongation_res, pi_res) %>%
+  mutate(SynCom = str_remove(var, "^Bacteria")) %>%
+  select(-var)
+Res
+```
+
+```{r}
+knitr::include_graphics("../figs/Fig3C.jpeg")
+```
+
+
+
+
+# References
+
+
+
+
+
