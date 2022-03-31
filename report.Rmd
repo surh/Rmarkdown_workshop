@@ -86,7 +86,7 @@ f1 <- Elongation ~ Pi_content + Bacteria + Experiment
 m1 <- lm(f1, data = Dat %>% filter(Elongation > 2))
 summary(m1)
 ```
-```{r results = "asis"}
+```{r, echo = FALSE, results = "asis"}
 knitr::kable(summary(m1)$coefficients,
              caption = paste("Coefficients of linear model (",
                              format(f1), ").",
@@ -96,14 +96,13 @@ knitr::kable(summary(m1)$coefficients,
 
 # Recreating figure 3C
 
-![Fig. 3C from @HerreraParedes2018](../figs/Fig3C.jpeg)
+![Fig. 3C from @HerreraParedes2018](figs/Fig3C.jpeg)
 
 [test single community](https://github.com/surh/wheelP/blob/master/R/test_single_community_phenotype.r)
 
 ```{r, echo = FALSE}
 test_phenotype <- function(Dat, phenotype){
-  
-  f1 <- paste(phenotype, "~", "Bacteria + EndP + Experiment")
+  f1 <- paste(phenotype, "~", "Bacteria + Experiment")
   f1 <- as.formula(f1)
   
   m1 <- lm(f1, data = Dat)
@@ -126,29 +125,50 @@ test_phenotype <- function(Dat, phenotype){
 ## Bacteria effect on shoot Pi content
 
 ```{r}
-pi_res <- test_phenotype(Dat, "Pi_content")
-pi_res
+Pi_res <- bind_rows(test_phenotype(Dat = Dat %>%
+                                     filter(EndP == "30 uM,0%Suc"),
+                                   phenotype = "Pi_content") %>%
+                      mutate(EndP = "30 uM"),
+                    test_phenotype(Dat = Dat %>%
+                                     filter(EndP == "100 uM,0%Suc"),
+                                   phenotype = "Pi_content") %>%
+                      mutate(EndP = "100 uM"))
+Pi_res
 ```
 
 
 ## Bacteria effect on main root elongation
 
 ```{r}
-elongation_res <- test_phenotype(Dat, "Elongation")
-elongation_res
+Elo_res <- bind_rows(test_phenotype(Dat = Dat %>%
+                                      filter(EndP == "30 uM,0%Suc"),
+                                    phenotype = "Elongation") %>%
+                       mutate(EndP = "30 uM"),
+                     test_phenotype(Dat = Dat %>%
+                                      filter(EndP == "100 uM,0%Suc"),
+                                    phenotype = "Elongation") %>%
+                       mutate(EndP = "100 uM"))
+Elo_res
 ```
 
 ## Combine the results
 
 ```{r}
-Res <- bind_rows(elongation_res, pi_res) %>%
+Res <- bind_rows(Pi_res, Elo_res) %>%
   mutate(SynCom = str_remove(var, "^Bacteria")) %>%
   select(-var)
 Res
 ```
 
 ```{r}
-knitr::include_graphics("../figs/Fig3C.jpeg")
+Res %>%
+  ggplot(aes(x = EndP, y = SynCom)) +
+  geom_tile(aes(fill = t.value)) +
+  scale_fill_gradient2(low = "magenta", mid = "white", high = "green",
+                       midpoint = 0) +
+  theme(panel.background = element_blank())
+
+# knitr::include_graphics("figs/Fig3C.jpeg")
 ```
 
 
