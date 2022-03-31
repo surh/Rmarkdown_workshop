@@ -160,21 +160,33 @@ Res <- bind_rows(Pi_res, Elo_res) %>%
 Res
 ```
 
-```{r}
+```{r, out.width="50%", fig.show='hold', fig.cap="**Left**: Estimates of bacterial effect on two plant phenotypes. **Right**: Similar estimates from @HerreraParedes2018."}
 Res %>%
+  mutate(significant = c("", "X")[ (p.value < 0.05) + 1 ]) %>%
+  mutate(SynCom = factor(SynCom,levels = rev(c("P1P2", "I1I2", "N2N3"))),
+         phenotye = factor(phenotype, levels = c("Pi_content", "Elongation"))) %>%
   ggplot(aes(x = EndP, y = SynCom)) +
+  facet_wrap(~phenotype) +
   geom_tile(aes(fill = t.value)) +
+  geom_text(aes(label = significant), size = 12) +
   scale_fill_gradient2(low = "magenta", mid = "white", high = "green",
                        midpoint = 0) +
-  theme(panel.background = element_blank())
-
-# knitr::include_graphics("figs/Fig3C.jpeg")
+  guides(fill = guide_legend(title = "Scaled Effect", title.position = "left")) +
+  theme(panel.background = element_blank(),
+        axis.text = element_text(color = "black"),
+        axis.title.y = element_text(face = "bold"),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        legend.title = element_text(face = "bold", angle = 90),
+        strip.background = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", size = 20))
+knitr::include_graphics("figs/Fig3C.jpeg")
 ```
 
 # Session Info
 
 ```{r}
-sessionInfo()
+sessionInfo
 ```
 
 
