@@ -82,6 +82,9 @@ Dat <- Dat %>%
 
 Now we have `r nrow(Dat)` observations in the dataset.
 
+After removing the outliars, whe check that the overal trends in the
+plot haven't changed.
+
 ```{r plot_phenotypes2}
 Dat %>%
   ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
@@ -90,15 +93,60 @@ Dat %>%
   theme_classic()
 ```
 
-## What is the effect of shoot Pi content on main root elongation?
+## What is the effect of shoot Pi content on main root elongation
+
+```{r cor_pval, echo = FALSE}
+r <- cor(Dat$Pi_content, Dat$Elongation)
+r.pval <- cor.test(Dat$Pi_content, Dat$Elongation)$p.value
+```
+
+The overall correlation between the Pi content and root elongation
+is **`r cor(Dat$Pi_content, Dat$Elongation)`** which has a *p*-value
+of `r cor.test(Dat$Pi_content, Dat$Elongation)$p.value` which is
+`r ifelse(r.pval < 0.05, "", "not")` significant.
+
+However, we want to calculate the correlation independently for each
+condition.
+
+* The correlation between the Pi content and root elongation in
+the $30 \mu M$ Pi condition is 
+**`r cor(Dat$Pi_content[ Dat$EndP == "30 uM,0%Suc" ], Dat$Elongation[ Dat$EndP == "30 uM,0%Suc" ])`**
+which has a *p*-value of
+`r cor.test(Dat$Pi_content[ Dat$EndP == "30 uM,0%Suc" ], Dat$Elongation[ Dat$EndP == "30 uM,0%Suc" ])$p.value`.
+
+* The correlation between the Pi content and root elongation in
+the $100 \mu M$ Pi condition is 
+**`r cor(Dat$Pi_content[ Dat$EndP == "100 uM,0%Suc" ], Dat$Elongation[ Dat$EndP == "100 uM,0%Suc" ])`**
+which has a *p*-value of
+`r cor.test(Dat$Pi_content[ Dat$EndP == "100 uM,0%Suc" ], Dat$Elongation[ Dat$EndP == "100 uM,0%Suc" ])$p.value`.
+
+Thus the effect correlation of between Pi starvation & main root elongation
+is stronger when the Pi starvation is more severe.
+
+## Controling for covariates
+
+
 
 ```{r}
-f1 <- Elongation ~ Pi_content + Bacteria + Experiment
+f1 <- Elongation ~ Pi_content + Bacteria + EndP + Experiment
 m1 <- lm(f1, data = Dat %>% filter(Elongation > 2))
 summary(m1)
 ```
+
+```{r}
+f2 <- Elongation ~ Pi_content + Bacteria + Experiment
+m2 <- lm(f2, data = Dat %>% filter(Elongation > 2))
+anova(m1, m2, test = "LRT")
+```
+```{r}
+summary(m2)
+```
+
+
+
+
 ```{r, echo = FALSE, results = "asis"}
-knitr::kable(summary(m1)$coefficients,
+knitr::kable(summary(m2)$coefficients,
              caption = paste("Coefficients of linear model (",
                              format(f1), ").",
                              "We observe that shoot Pi content has no significant",
@@ -108,8 +156,6 @@ knitr::kable(summary(m1)$coefficients,
 # Recreating figure 3C
 
 ![Fig. 3C from @HerreraParedes2018](figs/Fig3C.jpeg)
-
-[test single community](https://github.com/surh/wheelP/blob/master/R/test_single_community_phenotype.r)
 
 ```{r, echo = FALSE}
 test_phenotype <- function(Dat, phenotype){
