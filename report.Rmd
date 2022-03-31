@@ -171,6 +171,11 @@ Res %>%
 # knitr::include_graphics("figs/Fig3C.jpeg")
 ```
 
+# Session Info
+
+```{r}
+sessionInfo()
+```
 
 
 
