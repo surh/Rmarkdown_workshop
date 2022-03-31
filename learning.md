@@ -44,9 +44,12 @@ Must be covered
 * dplyr manipulations (!!!)
 * Displaying image from file in code chunk
 * Displaying images side by side
+   + out.width
+   + fig.show
+   + fig.cap
 * SessionInfo()
 * rmarkdown::render()
-* knitr::purl
+* knitr::purl()
 
 ## Advanced topics
 
@@ -56,9 +59,7 @@ Time permitting
 * Other output formats
 * Figure code chunk options
     + fig.align
-    + fig.cap
     + fig.height
-    + fig.width
 * Params in YAML header
 * Lists !!!
 * Footnotes

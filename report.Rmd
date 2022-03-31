@@ -24,13 +24,14 @@ in the GitHub repository [surh/wheelP](https://github.com/surh/wheelP).
 The first step is to load the packages and data that we need for analysis.
 We will use the [tidyverse](https://www.tidyverse.org/) collection of packages
 
-```{r}
+```{r packages}
 library(tidyverse)
 ```
 
 Now, we read the data which is in the `data` directory of the GitHub repository
 of the workshop, and we can print the first few rows.
-```{r read data}
+
+```{r read_data}
 Dat <- read_tsv("data/phenotypes.tsv",
                 col_types = cols(Pi_content = col_number(),
                                  Elongation = col_number(),
@@ -51,7 +52,11 @@ cocktails (P1P2, I1I2, N2N3) or no bacteria (axenic).
 
 # Sanity checks
 
-```{r pheno cors}
+When *A .thaliana* plants are starved for Pi, they suppress the elongation
+of their main root, because in the soils where they live, Pi is located in
+the topmost layers.
+
+```{r plot_phenotypes}
 Dat %>%
   ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
   geom_point() +
@@ -59,19 +64,25 @@ Dat %>%
   theme_classic()
 ```
 
-```{r}
+There are three apparent outliars in the bottom left corner of the plot.
+We sort the dataset by Elongation to investigate further,
+
+```{r explore_outliars}
 Dat %>%
   arrange(Elongation)
 ```
 
-```{r}
+The three smallest elongation measurements all come from the same experiment and
+treatment. So we decide to remove them from further analysis.
+
+```{r remove_outliars}
 Dat <- Dat %>%
   filter(Elongation > 2)
 ```
 
 Now we have `r nrow(Dat)` observations in the dataset.
 
-```{r}
+```{r plot_phenotypes2}
 Dat %>%
   ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
   geom_point() +
