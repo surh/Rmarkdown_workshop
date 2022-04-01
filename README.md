@@ -10,6 +10,8 @@ and its output together.
 The data analyzed is a subset of the data from the
 [surh/wheelP](https://github.com/surh/wheelP) R package.
 
+Furhter RMarkdown resources can be found in [Resources.md](Resources.md).
+
 # Requirements
 
 All you need is a relativeley recent version of R, RStudio and
