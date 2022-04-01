@@ -125,7 +125,8 @@ dataset.
 
 It is always a good idea to check that the overall trends didn't change
 with the removal of the outliars (and after any type of subsetting). So we
-can make the same plot again with the modified datase.
+can make the same plot again with the modified dataset. This time,
+we also save the plot to the `p1` variable.
 
 Note that if we just copy the chunk from the first scatter plot (with the
 outliars), we would get an error because the chunk names would be the same.
@@ -133,11 +134,12 @@ So we need to change the name to something unique before rendering the
 RMarkdown file.
 
 ```{r plot_phenotypes2, fig.cap="Scatter plot of main root elongation (Elongation) and shoot Pi content (Pi_content) with outliars removed."}
-Dat %>%
+p1 <- Dat %>%
   ggplot(aes(x = Pi_content, y = Elongation, col = EndP)) +
   geom_point() +
   geom_smooth(method = "lm", formula = y ~ x) +
   theme_classic()
+p1
 ```
 
 Overall, the trends remain the same after we removed the outliars, which
@@ -279,93 +281,51 @@ knitr::kable(summary(m2)$coefficients,
                              "effect on main root elongation."))
 ```
 
-# Recreating figure 3C
+# Summary
 
-![Fig. 3C from @HerreraParedes2018](figs/Fig3C.jpeg)
+As conclusions from our analysis we have that:
 
-```{r, echo = FALSE}
-test_phenotype <- function(Dat, phenotype){
-  f1 <- paste(phenotype, "~", "Bacteria + Experiment")
-  f1 <- as.formula(f1)
-  
-  m1 <- lm(f1, data = Dat)
-  Res <- summary(m1)$coefficients
-  
-  Res <- as.data.frame(Res)
-  Res$var <- row.names(Res)
-  row.names(Res) <- NULL
-  Res <- Res %>%
-    filter(var %in% c("BacteriaI1I2", "BacteriaN2N3", "BacteriaP1P2" )) %>%
-    mutate(phenotype = phenotype) %>%
-    rename(se = "Std. Error",
-           t.value = "t value",
-           p.value = "Pr(>|t|)")
-  
-  return(Res)
-}
-```
+1. There is an effect of shot Pi content in main root elongation. This effect
+seems to be stronger in more Pi limiting conditions but that difference is not
+statistically significant.
 
-## Bacteria effect on shoot Pi content
+2. The specific bacterial cocktail used has the strongest effect on main
+root elongation.
 
-```{r}
-Pi_res <- bind_rows(test_phenotype(Dat = Dat %>%
-                                     filter(EndP == "30 uM,0%Suc"),
-                                   phenotype = "Pi_content") %>%
-                      mutate(EndP = "30 uM"),
-                    test_phenotype(Dat = Dat %>%
-                                     filter(EndP == "100 uM,0%Suc"),
-                                   phenotype = "Pi_content") %>%
-                      mutate(EndP = "100 uM"))
-Pi_res
-```
+3. In general, the presence of bacteria decreases main root elongation,
+which is consistent with the published analysis by @HerreraParedes2018.
 
+We can illustrate the first conclusion with the earlier scatter plot
+between Pi content & root elongation (saved to `p1`), and create
+a boxplot for conclusion 2. For conclusion 3, it would be nice to
+include an external figure from the original publication. 
 
-## Bacteria effect on main root elongation
+We can add a figure from an image file anywhere outside outside of a code
+chunk with the syntax `![catpiton](path/to/image/file)`, but we lose some of
+the ability to control its appearance. Instead, we can display the image
+from a code chunk with the `include_graphics` function from the knitr package.
 
-```{r}
-Elo_res <- bind_rows(test_phenotype(Dat = Dat %>%
-                                      filter(EndP == "30 uM,0%Suc"),
-                                    phenotype = "Elongation") %>%
-                       mutate(EndP = "30 uM"),
-                     test_phenotype(Dat = Dat %>%
-                                      filter(EndP == "100 uM,0%Suc"),
-                                    phenotype = "Elongation") %>%
-                       mutate(EndP = "100 uM"))
-Elo_res
-```
+Finally, we can display multiple images side by side if we add the code
+chunk option `fig.show="hold"` and we play with the code chunk option
+`out.width`.
 
-## Combine the results
+With this tools we can now make the final plot and display the three images
+that illustrate our conclusions.
 
-```{r}
-Res <- bind_rows(Pi_res, Elo_res) %>%
-  mutate(SynCom = str_remove(var, "^Bacteria")) %>%
-  select(-var)
-Res
-```
-
-```{r, out.width="50%", fig.show='hold', fig.cap="**Left**: Estimates of bacterial effect on two plant phenotypes. **Right**: Similar estimates from @HerreraParedes2018."}
-Res %>%
-  mutate(significant = c("", "X")[ (p.value < 0.05) + 1 ]) %>%
-  mutate(SynCom = factor(SynCom,levels = rev(c("P1P2", "I1I2", "N2N3"))),
-         phenotye = factor(phenotype, levels = c("Pi_content", "Elongation"))) %>%
-  ggplot(aes(x = EndP, y = SynCom)) +
-  facet_wrap(~phenotype) +
-  geom_tile(aes(fill = t.value)) +
-  geom_text(aes(label = significant), size = 12) +
-  scale_fill_gradient2(low = "magenta", mid = "white", high = "green",
-                       midpoint = 0) +
-  guides(fill = guide_legend(title = "Scaled Effect", title.position = "left")) +
-  theme(panel.background = element_blank(),
-        axis.text = element_text(color = "black"),
-        axis.title.y = element_text(face = "bold"),
-        axis.title.x = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        legend.title = element_text(face = "bold", angle = 90),
-        strip.background = element_blank(),
-        strip.text = element_text(color = "black", face = "bold", size = 20))
+```{r,  out.width="33%", fig.show='hold',fig.cap="**Left**: Correlation between shoot Pi content and main root elongation in different environmental Pi levels. **Center**: Distribution of main root elongation measurements stratified by bacterial treatment. Color indicates corresponding shoot Pi content. **Right**: figure 3C from @HerreraParedes2018 showing confirming that most bacterial cocktails decrease main root elongation."}
+p1
+Dat %>%
+  ggplot(aes(x = Bacteria, y = Elongation)) +
+  geom_boxplot(outlier.color = NA) +
+  geom_point(aes(fill = Pi_content),
+             position = position_jitter(width = 0.1),
+             shape = 21, size = 3) +
+  scale_fill_gradient2(low = "magenta",
+                       mid = "white", high = "green",
+                       midpoint = 10) +
+  theme_classic()
 knitr::include_graphics("figs/Fig3C.jpeg")
 ```
-
 # Session Info
 
 ```{r}
