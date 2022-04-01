@@ -7,6 +7,8 @@ output:
     toc: TRUE
     toc_float: TRUE
 bibliography: references.bib
+params:
+  data_file: "data/phenotypes.tsv"
 ---
 
 This document was created for the workshop **Data Management for Publishing:
@@ -43,7 +45,7 @@ was automatically loaded when we loaded the `tidyverse` package).
 After reading the file, we simply print the first few rows to inspect it.
 
 ```{r read_data}
-Dat <- read_tsv("data/phenotypes.tsv",
+Dat <- read_tsv(params$data_file,
                 col_types = cols(Pi_content = col_number(),
                                  Elongation = col_number(),
                                  Experiment = col_character(),
