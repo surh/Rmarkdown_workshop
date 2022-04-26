@@ -13,8 +13,5 @@ jobs:
       - run: mkdir ~/.ssh
       - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
       - run: chmod 400 ~/.ssh/id_rsa
-      # - run: eval "$(ssh-agent -s)"
-      # - run: ssh-add key
-      # - run: ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-      # - run: export GIT_SSH_PRIVATE_KEY="${{ secrets.SSH_PRIVATE_KEY }}"
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop
+      - run: git push --mirror git@github.com:publishdata/Rmarkdown_workshop
