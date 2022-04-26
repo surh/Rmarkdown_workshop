@@ -6,16 +6,15 @@ jobs:
   mirror-to-publishdata:
     runs-on: ubuntu-latest
     steps:
-      #- uses: actions/checkout@v3
-      #  with:
-      #    fetch-depth: 0
-      - run: git config --global user.email ${{ github.event.pusher.email }}
-      - run: git config --global user.name ${{ github.event.pusher.name }}
-      - env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      - run: |
+      - name: set SSH
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+
+      - run: git config --global user.email ${{ github.event.pusher.email }}
+      - run: git config --global user.name ${{ github.event.pusher.name }}
           #- run: mkdir ~/.ssh
           # - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           #- run: chmod 400 ~/.ssh/id_rsa
