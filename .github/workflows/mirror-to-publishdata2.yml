@@ -5,5 +5,7 @@ concurrency:
 jobs:
   mirror-to-publishdata:
     runs-on: ubuntu-latest
+    - env:
+      EMAIL: ${{ github.event.pusher.email }}
     steps:
       - uses: actions/checkout@v3
