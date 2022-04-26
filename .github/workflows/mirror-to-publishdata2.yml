@@ -12,6 +12,7 @@ jobs:
       - run: git config --global user.email ${{ github.event.pusher.email }}
       - run: mkdir ~/.ssh
       - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      - run: chmod 400 ~/.ssh/id_rsa
       # - run: eval "$(ssh-agent -s)"
       # - run: ssh-add key
       # - run: ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
