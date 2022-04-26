@@ -10,8 +10,8 @@ jobs:
         with:
           fetch-depth: 0
       - run: git config --global user.email ${{ github.event.pusher.email }}
-      - run: eval "$(ssh-agent -s)"
-      - run: ssh-agent -a /tmp/ssh_agent.sock > /dev/null
-      - run: ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+      - run:
+        eval "$(ssh-agent -s)"
+        ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
       # - run: export GIT_SSH_PRIVATE_KEY="${{ secrets.SSH_PRIVATE_KEY }}"
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop
