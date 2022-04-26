@@ -11,9 +11,14 @@ jobs:
       #    fetch-depth: 0
       - run: git config --global user.email ${{ github.event.pusher.email }}
       - run: git config --global user.name ${{ github.event.pusher.name }}
-      - run: mkdir ~/.ssh
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      - run: chmod 400 ~/.ssh/id_rsa
+      - env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      - run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+          #- run: mkdir ~/.ssh
+          # - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          #- run: chmod 400 ~/.ssh/id_rsa
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop ./
       # - run: ls -la
       # - run: pwd
