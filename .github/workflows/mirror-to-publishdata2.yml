@@ -14,12 +14,7 @@ jobs:
         run: |
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          #- run: mkdir ~/.ssh
-          # - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          #- run: chmod 400 ~/.ssh/id_rsa
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop ./
-      # - run: ls -la
-      # - run: pwd
       - name: set SSH for mirror
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
