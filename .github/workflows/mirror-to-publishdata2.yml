@@ -6,20 +6,24 @@ jobs:
   mirror-to-publishdata:
     runs-on: ubuntu-latest
     steps:
-      - name: set SSH
+      - run: git config --global user.email ${{ github.event.pusher.email }}
+      - run: git config --global user.name ${{ github.event.pusher.name }}
+      - name: set SSH for source
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          ssh-add - <<< "${{ secrets.SSH_MIRROR_PRIVATE_KEY }}"
-
-      - run: git config --global user.email ${{ github.event.pusher.email }}
-      - run: git config --global user.name ${{ github.event.pusher.name }}
           #- run: mkdir ~/.ssh
           # - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           #- run: chmod 400 ~/.ssh/id_rsa
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop ./
       # - run: ls -la
       # - run: pwd
+      - name: set SSH for mirror
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_MIRROR_PRIVATE_KEY }}"
       - run: git push --mirror git@github.com:publishdata/Rmarkdown_workshop
