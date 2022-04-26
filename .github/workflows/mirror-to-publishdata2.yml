@@ -1,7 +1,7 @@
 name: mirror-to-publishdata
 on: [push]
 jobs:
-  check-bats-version:
+  mirror-to-publishdata:
     runs-on: ubuntu-latest
     steps:
             - uses: actions/checkout@v3
