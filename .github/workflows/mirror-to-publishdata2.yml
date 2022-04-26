@@ -10,7 +10,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: git config --global user.email ${{ github.event.pusher.email }}
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }" > ~/.ssh/key
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/key
       - run: eval "$(ssh-agent -s)"
       - run: ssh-add ~/.ssh/key
       # - run: ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
