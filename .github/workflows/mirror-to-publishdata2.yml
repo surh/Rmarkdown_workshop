@@ -10,5 +10,5 @@ jobs:
         with:
           fetch-depth: 0
       - run: git config --global user.email ${{ github.event.pusher.email }}
-      - run: GIT_SSH_PRIVATE_KEY = ${{ secrets.SSH_PRIVATE_KEY }}
+      - run: export GIT_SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop
