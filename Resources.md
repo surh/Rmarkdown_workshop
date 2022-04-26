@@ -1,3 +1,6 @@
+* There are multimple R Markdown cheatsheets:
+	1. [By RStudio](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+	2. [By R Markdown](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown-2.0.pdf)
 * [**R Markdown Cookbook**](https://bookdown.org/yihui/rmarkdown-cookbook/)
 * [**R Markdown: The Definitive Guide**](https://bookdown.org/yihui/rmarkdown/)
 * [**R Markdown from RStudio**](https://rmarkdown.rstudio.com/lesson-1.html)
