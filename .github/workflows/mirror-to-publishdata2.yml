@@ -5,10 +5,7 @@ concurrency:
 jobs:
   mirror-to-publishdata:
     runs-on: ubuntu-latest
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - env:
-      EMAIL: ${{ github.event.pusher.email }}
     steps:
       - uses: actions/checkout@v3
+      - env:
+        EMAIL: ${{ github.event.pusher.email }}
