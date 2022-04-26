@@ -2,8 +2,9 @@ name: mirror-to-publishdata
 on: [push]
 concurrency:
   group: mirror-to-publishdata
+
 jobs:
-  mirror:
+  my_first_job:
     runs-on: ubuntu-latest
     - env:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
