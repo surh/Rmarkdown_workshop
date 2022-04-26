@@ -1,7 +1,9 @@
 name: mirror-to-publishdata
 on: [push]
+concurrency:
+  group: mirror-to-publishdata
 jobs:
   mirror-to-publishdata:
     runs-on: ubuntu-latest
     steps:
-            - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
