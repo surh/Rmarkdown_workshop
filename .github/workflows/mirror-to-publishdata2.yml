@@ -1,4 +1,4 @@
-name: learn-github-actions
+name: mirror-to-publishdata
 on: [push]
 jobs:
   check-bats-version:
