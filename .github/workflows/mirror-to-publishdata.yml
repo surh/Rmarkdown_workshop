@@ -1,13 +1,22 @@
 name: mirror-to-publishdata
 on: [push]
+
+concurrency:
+  group: mirror-to-publishdata
+
 jobs:
-  check-bats-version:
+  mirror-to-publishdata:
     runs-on: ubuntu-latest
+    - env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      EMAIL: ${{ github.event.pusher.email }}
+      NAME: ${{ github.event.pusher.name }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+      - run: git config --global user.email "$EMAIL"
+      - run: git config --global user.name "$NAME"
+      - run: git clone --bare git@github.com:USERNAME/REPONAME
+      - run: cd REPONAME
+      - run: git push --mirror git@github.com:publishdata/REPONAME
+
+
 
