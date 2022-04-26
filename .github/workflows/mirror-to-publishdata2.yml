@@ -14,4 +14,6 @@ jobs:
       - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
       - run: chmod 400 ~/.ssh/id_rsa
       - run: git clone --bare git@github.com:surh/Rmarkdown_workshop
+      - run: ls -la
+      - run: cd Rmarkdown_workshop/
       - run: git push --mirror git@github.com:publishdata/Rmarkdown_workshop
