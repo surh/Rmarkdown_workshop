@@ -19,12 +19,12 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: git clone --bare git@github.com:surh/Rmarkdown_workshop ./
 
-        - name: set SSH for mirror
-          env:
-            SSH_AUTH_SOCK: /tmp/ssh_agent2.sock
-          run: |
-            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-            ssh-add - <<< "${{ secrets.SSH_MIRROR_PRIVATE_KEY }}"
+      - name: set SSH for mirror
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent2.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.SSH_MIRROR_PRIVATE_KEY }}"
       - name: push to mirror
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent2.sock
