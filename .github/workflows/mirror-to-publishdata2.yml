@@ -19,4 +19,4 @@ jobs:
       # - run: cd Rmarkdown_workshop.git/
       - run: pwd
       # - run: ls -la
-      #- run: git push --mirror git@github.com:publishdata/Rmarkdown_workshop
+      - run: git push --mirror git@github.com:publishdata/Rmarkdown_workshop
